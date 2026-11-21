@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { Toaster, toast } from 'sonner';
 import { FolderOpen, Minimize2 } from 'lucide-react';
@@ -7,9 +7,7 @@ import { useArtworkUrl } from '../components/common';
 import { Sidebar, MobileNav, MiniBar } from './Navigation';
 import { TransportBar } from './TransportBar';
 import { NowPlayingPanel } from './NowPlayingPanel';
-import { FullPlayer } from './FullPlayer';
 import { GlobalKeys } from './GlobalKeys';
-import { GlobalDialogs } from './GlobalDialogs';
 import { Artwork } from '../components/common';
 import { PresetChips, SeekBar, TransportButtons } from '../components/player/PlayerControls';
 import { VisualizerCanvas } from '../components/player/VisualizerCanvas';
@@ -20,8 +18,61 @@ import { useUi } from '../state/ui';
 import { useActiveTheme } from '../state/theme';
 import { importItems, type ImportItem } from '../lib/localFiles';
 import { db } from '../db/db';
-import { AskHost } from '../components/Ask';
+import { InstallBanner } from '../components/InstallBanner';
 import { onPlayerEvent } from '../player/events';
+
+// Non-critical UI loads after first paint (keeps the shell's first-load JS small).
+const LazyFullPlayer = lazy(async () => ({ default: (await import('./FullPlayer')).FullPlayer }));
+const LazyDeferredUi = lazy(async () => {
+  const [{ GlobalDialogs }, { AskHost }] = await Promise.all([
+    import('./GlobalDialogs'),
+    import('../components/Ask'),
+  ]);
+  return {
+    default: () => (
+      <>
+        <GlobalDialogs />
+        <AskHost />
+      </>
+    ),
+  };
+});
+
+/** Mount the full-screen player only once it has been opened. */
+function FullPlayerHost() {
+  const open = useUi((s) => s.fullPlayer);
+  const [ever, setEver] = useState(open);
+  useEffect(() => {
+    if (open) setEver(true);
+  }, [open]);
+  return ever ? (
+    <Suspense fallback={null}>
+      <LazyFullPlayer />
+    </Suspense>
+  ) : null;
+}
+
+/** Load dialogs (palette, cheat sheet, export…) when the browser is idle or one is requested. */
+function DeferredUiHost() {
+  const wanted = useUi(
+    (s) =>
+      s.commandOpen || s.cheatSheetOpen || Boolean(s.versionsFor || s.assignFor || s.exportFor),
+  );
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (wanted) return setReady(true);
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+    };
+    if (w.requestIdleCallback) w.requestIdleCallback(() => setReady(true), { timeout: 3000 });
+    else setTimeout(() => setReady(true), 1500);
+  }, [wanted]);
+  return ready ? (
+    <Suspense fallback={null}>
+      <LazyDeferredUi />
+    </Suspense>
+  ) : null;
+}
 
 /** Applies the active theme (+ adaptive accent, text scale, motion) whenever inputs change. */
 function ThemeController() {
@@ -292,13 +343,13 @@ export function AppShell() {
       <Frame>
         <Outlet />
       </Frame>
-      <FullPlayer />
+      <FullPlayerHost />
       <GlobalKeys />
-      <GlobalDialogs />
+      <DeferredUiHost />
       <DropZone />
       <TapToStart />
       <Announcer />
-      <AskHost />
+      <InstallBanner />
       <Toaster
         theme="dark"
         position="top-center"

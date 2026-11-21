@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
-import { encode, type EncodeMessage, type EncodeRequest } from './encode';
+import { encode } from './encode';
+import type { EncodeMessage, EncodeRequest } from './formats';
 
 const scope = self as unknown as DedicatedWorkerGlobalScope;
 

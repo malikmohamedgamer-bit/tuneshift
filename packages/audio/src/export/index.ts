@@ -5,9 +5,9 @@ import {
   type EncodeMessage,
   type EncodeRequest,
   type ExportFormat,
-} from './encode';
+} from './formats';
 
-export { EXPORT_FORMATS, type ExportFormat } from './encode';
+export { EXPORT_FORMATS, type ExportFormat } from './formats';
 export { renderWithEffects, decodeFile, tailSeconds } from './render';
 
 export type ExportPhase = 'decode' | 'render' | 'encode';

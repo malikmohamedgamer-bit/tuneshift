@@ -88,6 +88,7 @@ function builder(table: string) {
 
 const fakeClient = { from: (t: string) => builder(t) };
 vi.mock('./supabase', () => ({
+  loadSupabase: () => Promise.resolve(fakeClient),
   getSupabase: () => fakeClient,
   requireSupabase: () => fakeClient,
   isSupabaseConfigured: () => true,

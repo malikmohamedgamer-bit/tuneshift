@@ -7,6 +7,7 @@ import { makeRouter } from './router';
 import { player } from './player/controller';
 import { loadDemoTracks } from './lib/demo';
 import { startPlatform } from './platform';
+import { registerPwa } from './platform/pwa';
 
 export function App() {
   const router = useMemo(() => makeRouter(), []);
@@ -19,6 +20,7 @@ export function App() {
     void player.restore();
     void startPlatform();
     void startSocial();
+    void registerPwa();
   }, []);
   return (
     <QueryClientProvider client={queryClient}>

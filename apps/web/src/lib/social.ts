@@ -1,6 +1,12 @@
 import { generateShortCode, validateSharePayload, type SharePayload } from '@tuneshift/core';
 import { z } from 'zod';
-import { getSupabase, requireSupabase, authRedirectUrl, isSupabaseConfigured } from './supabase';
+import {
+  getSupabase,
+  loadSupabase,
+  requireSupabase,
+  authRedirectUrl,
+  isSupabaseConfigured,
+} from './supabase';
 import { getAuth, setAuth, type Profile } from '../state/auth';
 import { resizeImage } from './images';
 import { useSettings } from '../state/settings';
@@ -11,7 +17,7 @@ let started = false;
 
 /** Wire Supabase auth into the app state (safe to call when Supabase isn't configured). */
 export async function initAuth(onSignedIn: () => void, onSignedOut: () => void): Promise<void> {
-  const sb = getSupabase();
+  const sb = await loadSupabase();
   if (!sb) {
     setAuth({ status: 'unconfigured', session: null, profile: null });
     return;

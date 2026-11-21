@@ -30,7 +30,7 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 - [x] P3 Sources
 - [x] P4 Player + library
 - [x] P5 Supabase (code + SQL validated offline; live project = LATER.md)
-- [ ] P6 PWA
+- [x] P6 PWA (offline shell, install prompt + iOS hint, update toast, Background-safe mode; critical-path JS 296 KB gz)
 - [ ] P7 Desktop (Tauri)
 - [ ] P8 Extension
 - [ ] P9 Polish & audit
@@ -130,7 +130,7 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 
 ### §11 Platforms
 
-- [ ] PWA (offline shell, install prompt, update toast, Background-safe mode)
+- [x] PWA (offline shell, install prompt, update toast, Background-safe mode)
 - [ ] GitHub Pages deploy (base, 404 fallback, scope)
 - [ ] Desktop: main window (title bar, state, tray-close), mini player, overlay, tray, global shortcuts, single instance, autostart, deep links, file associations
 - [ ] Desktop: Discord RPC, Boost mode (wizard, capture, latency, meter), SMTC, WebView2 permission

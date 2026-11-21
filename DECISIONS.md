@@ -55,3 +55,9 @@
 - Share links: offline codes (`ts1.<kind>.<deflate+base64url>.<checksum>`) work with no server at all; short codes need Supabase and resolve through the `get_share` SECURITY DEFINER RPC that returns only the requested row.
 - No live Postgres/Supabase was available: SQL is syntax-checked in CI with `libpg-query` (the real Postgres 18 parser, WASM), and the sync engine is tested against an in-memory fake client.
 - Supabase URL + anon key can be pasted at runtime (Settings → Account) — the Pages build needs no secrets; service-role keys are rejected by a JWT `role` / `sb_secret_` check.
+
+## PWA & performance (phase 6)
+- Service worker: vite-plugin-pwa `generateSW`, `registerType: 'prompt'` → an update toast with Reload; demo loops cached at runtime (CacheFirst + range requests), cover art StaleWhileRevalidate, streamed audio never cached.
+- Precache only Latin font subsets; other scripts' subsets load on demand.
+- Bundle budget: supabase-js loads only when a project is configured; the MP3 encoder only inside the export worker (formats split from the encoder); full-screen player, queue view, command palette and dialogs are lazy (idle or on first use). Measured with `scripts/measure-bundle.mjs`: 296 KB gz requested before the load event (target < 300 KB).
+- Install: Chromium `beforeinstallprompt` (banner after 60 s of use + Settings → About); iOS shows Add-to-Home-Screen steps (no prompt API).

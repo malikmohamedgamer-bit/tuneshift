@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Tabs } from 'radix-ui';
 import { Link, useNavigate } from 'react-router';
 import { Maximize2, SlidersHorizontal, WandSparkles, X } from 'lucide-react';
@@ -11,12 +12,15 @@ import {
 } from '../components/common';
 import { LikeButton } from '../components/LikeButton';
 import { PresetBadge, PresetChips } from '../components/player/PlayerControls';
-import { QueueView } from '../components/player/QueueView';
 import { LyricsView } from '../components/player/LyricsView';
 import { VisualizerCanvas } from '../components/player/VisualizerCanvas';
 import { usePlayer } from '../state/player';
 import { useSettings } from '../state/settings';
 import { useUi, type NowTab } from '../state/ui';
+
+const QueueView = lazy(async () => ({
+  default: (await import('../components/player/QueueView')).QueueView,
+}));
 
 const tabCls =
   'flex-1 rounded-full px-3 py-1.5 text-xs font-semibold text-muted transition data-[state=active]:bg-surface-hover data-[state=active]:text-fg';
@@ -134,7 +138,9 @@ export function NowPlayingPanel() {
               </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="queue" className="min-h-0 flex-1 overflow-y-auto pt-2">
-              <QueueView />
+              <Suspense fallback={<p className="text-sm text-muted">Loading queue…</p>}>
+                <QueueView />
+              </Suspense>
             </Tabs.Content>
             <Tabs.Content value="lyrics" className="min-h-0 flex-1 overflow-hidden pt-2">
               <LyricsView track={current} />

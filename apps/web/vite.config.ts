@@ -49,7 +49,11 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
-          globIgnores: ['**/demo/**'],
+          // Precache the shell + Latin font subsets only (other scripts load on demand).
+          globIgnores: [
+            '**/demo/**',
+            '**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese,math,symbols}-*.woff2',
+          ],
           navigateFallback: `${base}index.html`,
           navigateFallbackDenylist: [/\/demo\//],
           maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
@@ -82,6 +86,26 @@ export default defineConfig(({ mode }) => {
     ],
     worker: { format: 'es' },
     build: {
+      rollupOptions: process.env.ANALYZE
+        ? {
+            output: {
+              // Diagnostic only: one chunk per dependency to see what each costs.
+              manualChunks(id: string) {
+                const path = id.replaceAll(String.fromCharCode(92), '/');
+                const parts = path.split('/node_modules/');
+                if (parts.length > 1) {
+                  const rest = (parts[parts.length - 1] ?? '').split('/');
+                  const name = rest[0]?.startsWith('@')
+                    ? `${rest[0].slice(1)}_${rest[1]}`
+                    : rest[0];
+                  return `dep-${name}`;
+                }
+                const pkg = /packages\/(\w+)/.exec(path);
+                return pkg ? `pkg-${pkg[1]}` : undefined;
+              },
+            },
+          }
+        : undefined,
       target: 'es2022',
       sourcemap: false,
       chunkSizeWarningLimit: 900,

@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getKeys, publicSiteUrl, subscribeKeys } from '../env';
 import { isTauri } from '../platform/detect';
 
@@ -16,11 +16,16 @@ export function isSupabaseConfigured(): boolean {
   return Boolean(k.supabaseUrl && k.supabaseAnonKey);
 }
 
-export function getSupabase(): SupabaseClient | null {
+/**
+ * Loads supabase-js on demand — only when a project is configured — so the web bundle stays
+ * small for everyone using Tuneshift without an account.
+ */
+export async function loadSupabase(): Promise<SupabaseClient | null> {
   const k = getKeys();
   if (!k.supabaseUrl || !k.supabaseAnonKey) return null;
   const id = `${k.supabaseUrl}|${k.supabaseAnonKey}`;
   if (client && clientFor === id) return client;
+  const { createClient } = await import('@supabase/supabase-js');
   client = createClient(k.supabaseUrl, k.supabaseAnonKey, {
     auth: {
       flowType: 'pkce',
@@ -33,6 +38,12 @@ export function getSupabase(): SupabaseClient | null {
   });
   clientFor = id;
   return client;
+}
+
+/** The loaded client (after `loadSupabase()`), or null. */
+export function getSupabase(): SupabaseClient | null {
+  const k = getKeys();
+  return client && clientFor === `${k.supabaseUrl}|${k.supabaseAnonKey}` ? client : null;
 }
 
 /** Throws a friendly error when the backend isn't set up. */

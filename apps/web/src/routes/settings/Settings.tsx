@@ -45,6 +45,7 @@ import { SHORTCUTS, comboFromEvent, prettyCombo } from '../../lib/shortcuts';
 import { isIOS, isTauri } from '../../platform/detect';
 import { queryClient } from '../../lib/queryClient';
 import { confirmAction } from '../../components/Ask';
+import { promptInstall, useInstall } from '../../platform/pwa';
 
 const SECTIONS = [
   ['account', 'Account'],
@@ -940,9 +941,31 @@ function DataSection() {
   );
 }
 
+function InstallRow() {
+  const { canPrompt, installed, iosHint } = useInstall();
+  if (isTauri()) return null;
+  return (
+    <div className="rounded-ctl border border-line bg-surface p-3">
+      <p className="font-semibold text-fg">Install the app</p>
+      {installed ? (
+        <p>Tuneshift is installed on this device.</p>
+      ) : canPrompt ? (
+        <Button size="sm" className="mt-2" variant="primary" onClick={() => void promptInstall()}>
+          Install Tuneshift
+        </Button>
+      ) : iosHint ? (
+        <p>On iPhone/iPad: tap the Share button in Safari, then “Add to Home Screen”.</p>
+      ) : (
+        <p>Use your browser's menu → “Install Tuneshift” (or “Add to Home screen” on Android).</p>
+      )}
+    </div>
+  );
+}
+
 function AboutSection() {
   return (
     <div className="space-y-3 text-sm text-muted">
+      <InstallRow />
       <p>
         <span className="font-display text-lg font-bold text-fg">Tuneshift</span> v{APP_VERSION} — a
         personal, non-commercial music app with a live Sound Lab.
