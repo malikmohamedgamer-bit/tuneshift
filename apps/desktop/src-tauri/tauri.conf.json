@@ -1,0 +1,108 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Tuneshift",
+  "version": "0.1.0",
+  "identifier": "app.tuneshift.desktop",
+  "build": {
+    "frontendDist": "../../web/dist-desktop",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm --filter @tuneshift/web dev",
+    "beforeBuildCommand": "pnpm --filter @tuneshift/web build:desktop"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Tuneshift",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 420,
+        "minHeight": 560,
+        "center": true,
+        "decorations": false,
+        "resizable": true,
+        "visible": true,
+        "backgroundColor": "#0d0b14",
+        "backgroundThrottling": "disabled",
+        "dragDropEnabled": false
+      },
+      {
+        "label": "mini",
+        "title": "Tuneshift mini player",
+        "url": "index.html?window=mini",
+        "width": 340,
+        "height": 110,
+        "minWidth": 300,
+        "minHeight": 96,
+        "maxWidth": 520,
+        "maxHeight": 420,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "resizable": true,
+        "shadow": false
+      },
+      {
+        "label": "overlay",
+        "title": "Tuneshift overlay",
+        "url": "index.html?window=overlay",
+        "width": 480,
+        "height": 88,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": true,
+        "focus": false,
+        "focusable": false,
+        "resizable": false,
+        "shadow": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self' ipc: http://ipc.localhost; script-src 'self' 'wasm-unsafe-eval' blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https: http://asset.localhost asset:; media-src 'self' blob: data: https: http://asset.localhost asset:; connect-src 'self' ipc: http://ipc.localhost https: wss: http://asset.localhost asset:; worker-src 'self' blob:",
+      "assetProtocol": {
+        "enable": true,
+        "scope": { "allow": [], "deny": [] }
+      }
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": { "schemes": ["tuneshift"] }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Tuneshift",
+    "category": "Music",
+    "shortDescription": "Music with a live Sound Lab",
+    "longDescription": "Tuneshift plays your music, Audius and Jamendo with a live Sound Lab (sped up, slowed + reverb, bass, 8D, EQ), a mini player, a game overlay and Boost mode for other apps.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["mp3", "m4a", "aac", "flac", "wav", "ogg", "opus"],
+        "name": "Audio file",
+        "description": "Audio file",
+        "role": "Viewer",
+        "mimeType": "audio/*"
+      }
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

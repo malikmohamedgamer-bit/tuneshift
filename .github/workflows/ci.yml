@@ -30,6 +30,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm e2e
+      - name: Build extension
+        if: hashFiles('apps/extension/manifest.json') != ''
+        run: pnpm ext:build
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -38,3 +41,34 @@ jobs:
             playwright-report
             test-results
           retention-days: 7
+
+  desktop-crate:
+    name: Desktop crate (cargo check · clippy · test)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+      - name: Stub frontend dir for tauri::generate_context!
+        shell: bash
+        run: mkdir -p apps/web/dist-desktop && echo '<!doctype html><title>ci</title>' > apps/web/dist-desktop/index.html
+      - name: cargo check
+        working-directory: apps/desktop/src-tauri
+        run: cargo check --all-targets
+      - name: cargo clippy
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+      - name: cargo test
+        working-directory: apps/desktop/src-tauri
+        run: cargo test
+      - name: Upload Cargo.lock
+        uses: actions/upload-artifact@v4
+        with:
+          name: cargo-lock
+          path: apps/desktop/src-tauri/Cargo.lock
+
