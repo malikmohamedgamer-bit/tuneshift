@@ -246,7 +246,7 @@ do $$
 declare t text;
 begin
   foreach t in array array['playlists', 'playlist_tracks', 'sounds', 'themes', 'likes', 'history', 'user_records'] loop
-    execute format('create policy %L on public.%I for all to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id)', t || ': own rows', t);
+    execute format('create policy %I on public.%I for all to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id)', t || ': own rows', t);
   end loop;
 end $$;
 

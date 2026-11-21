@@ -16,7 +16,7 @@ insert into public.friendships (requester, addressee, status) values
 on conflict do nothing;
 
 insert into public.shares (code, owner, kind, payload) values
-  ('demo2345', '11111111-1111-1111-1111-111111111111', 'sound',
+  ('seed2345', '11111111-1111-1111-1111-111111111111', 'sound',
    '{"name":"Seed Nightcore","settings":{"version":1,"speed":1.4,"pitchMode":"tape"}}')
 on conflict (code) do nothing;
 
