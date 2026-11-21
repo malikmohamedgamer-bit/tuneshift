@@ -1,0 +1,255 @@
+/*
+ * Tuneshift design tokens → Tailwind. The theme engine (applyTheme) writes the CSS custom
+ * properties (--bg, --surface, --accent, --radius-md, …) on <html>; utilities read them, so a
+ * theme switch restyles everything without re-rendering.
+ */
+@import 'tailwindcss';
+@source './';
+
+@custom-variant dark (&:where([data-scheme='dark'], [data-scheme='dark'] *));
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-line: var(--border);
+  --color-fg: var(--text);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-on-accent: var(--accent-contrast);
+  --color-accent-fill: var(--accent-fill);
+  --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
+  --radius-chip: var(--radius-sm);
+  --radius-ctl: var(--radius-md);
+  --radius-card: var(--radius-lg);
+  --radius-panel: var(--radius-xl);
+  --font-body: var(--font-sans);
+  --font-heading: var(--font-display);
+  --shadow-theme: var(--shadow);
+}
+
+:root {
+  /* Fallbacks before the theme engine runs (Midnight Bloom). */
+  --bg: #0d0b14;
+  --bg-elevated: #15121f;
+  --surface: #1c1828;
+  --surface-hover: #262036;
+  --border: #2e2740;
+  --text: #f4f1fa;
+  --text-muted: #a9a2bd;
+  --accent: #8b5cf6;
+  --accent-2: #ec4899;
+  --accent-contrast: #ffffff;
+  --accent-fill: #8656f6;
+  --accent-text: #8b5cf6;
+  --accent-soft: rgba(139, 92, 246, 0.18);
+  --gradient-hero: linear-gradient(135deg, #8b5cf6, #ec4899);
+  --gradient-stops: #8b5cf6, #ec4899;
+  --radius-sm: 7px;
+  --radius-md: 14px;
+  --radius-lg: 21px;
+  --radius-xl: 28px;
+  --blur: 18px;
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Outfit Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  --density: 1;
+  --text-scale: 1;
+  --ambient: 0;
+  font-size: calc(16px * var(--text-scale));
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent-text);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: color-mix(in srgb, var(--bg-elevated) 78%, transparent);
+    backdrop-filter: blur(var(--blur)) saturate(1.2);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(1.2);
+  }
+  .bg-hero {
+    background-image: var(--gradient-hero);
+  }
+  .text-gradient {
+    background-image: var(--gradient-hero);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .pad-d {
+    padding: calc(1rem * var(--density));
+  }
+  .gap-d {
+    gap: calc(0.75rem * var(--density));
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Animated hero gradient (theme option). */
+@keyframes ts-gradient-pan {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+[data-animated-gradient='true'] .bg-hero {
+  background-size: 220% 220%;
+  animation: ts-gradient-pan 14s ease-in-out infinite;
+}
+
+/* Cherry Blossom petals. */
+@keyframes ts-petal-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(12vw, 110vh, 0) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+[data-reduced-motion='true'] *,
+[data-reduced-motion='true'] *::before,
+[data-reduced-motion='true'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Range input styling for the shared Slider (native input keeps full keyboard + a11y support). */
+.ts-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 22px;
+  background: transparent;
+  --fill: 50%;
+}
+.ts-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent-2) var(--fill),
+    var(--surface-hover) var(--fill)
+  );
+}
+.ts-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-hover);
+}
+.ts-range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent), var(--accent-2));
+}
+.ts-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 999px;
+  background: var(--text);
+  border: 3px solid var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.ts-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--text);
+  border: 3px solid var(--accent);
+}
+.ts-range:disabled {
+  opacity: 0.45;
+}
+.ts-range.vertical {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 22px;
+  height: 140px;
+}
+.ts-range.vertical::-webkit-slider-runnable-track {
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    var(--accent) 0%,
+    var(--accent-2) var(--fill),
+    var(--surface-hover) var(--fill)
+  );
+}
+.ts-range.vertical::-webkit-slider-thumb {
+  margin-top: 0;
+  margin-left: -6px;
+}

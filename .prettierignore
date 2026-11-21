@@ -1,0 +1,16 @@
+pnpm-lock.yaml
+node_modules
+dist
+dist-*
+coverage
+playwright-report
+test-results
+apps/desktop/src-tauri/target
+apps/desktop/src-tauri/gen
+apps/desktop/src-tauri/icons
+apps/web/public/demo
+e2e/fixtures/*.wav
+docs/SPEC.md
+*.rs
+Cargo.lock
+*.md

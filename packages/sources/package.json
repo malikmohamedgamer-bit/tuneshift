@@ -1,0 +1,20 @@
+{
+  "name": "@tuneshift/sources",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./mocks": "./src/mocks/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@tuneshift/core": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "msw": "3.0.7"
+  }
+}
