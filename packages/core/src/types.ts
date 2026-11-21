@@ -63,6 +63,8 @@ export interface Track {
   license?: TrackLicense;
   releaseDate?: string;
   playCount?: number;
+  /** The uploader is a verified artist on the source (Audius). */
+  artistVerified?: boolean;
   local?: LocalFileInfo;
   addedAt?: number;
 }
@@ -76,6 +78,7 @@ export interface Artist {
   bio?: string;
   followerCount?: number;
   trackCount?: number;
+  verified?: boolean;
   permalink?: string;
   tracks?: Track[];
 }

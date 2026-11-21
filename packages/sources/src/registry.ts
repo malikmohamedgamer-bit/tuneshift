@@ -123,21 +123,57 @@ export class SourceRegistry {
         }
       }
     });
-    out.tracks = interleave(out.tracks, (t) => t.source);
+    out.tracks = rankTracks(query, out.tracks);
+    // Searching for an artist by name: their own most-played songs come first, ahead of fan
+    // flips and remixes that merely mention them.
+    const artist = out.artists
+      .filter((a) => similarity(query, a.name) >= 0.9)
+      .sort(
+        (a, b) =>
+          Number(b.verified ?? 0) - Number(a.verified ?? 0) ||
+          (b.followerCount ?? 0) - (a.followerCount ?? 0),
+      )[0];
+    const adapter = artist && sources.find((s) => s.id === artist.source);
+    if (artist && adapter?.getArtist && types.includes('track')) {
+      try {
+        const own = (await adapter.getArtist(artist.id)).tracks?.slice(0, 10) ?? [];
+        const keys = new Set(own.map((t) => t.key));
+        out.tracks = [...own, ...out.tracks.filter((t) => !keys.has(t.key))];
+      } catch {
+        // The artist page failing must not break search; ranked results still show.
+      }
+    }
     out.top = pickTop(query, out);
     return out;
   }
 }
 
-/** Round-robin by source so one catalog doesn't bury the others. */
-function interleave<T>(items: T[], key: (t: T) => string): T[] {
-  const groups = new Map<string, T[]>();
-  for (const it of items) groups.set(key(it), [...(groups.get(key(it)) ?? []), it]);
-  const lists = [...groups.values()];
-  const out: T[] = [];
-  for (let i = 0; out.length < items.length; i++)
-    for (const l of lists) if (l[i] !== undefined) out.push(l[i] as T);
-  return out;
+/**
+ * Order merged track results: songs by an artist whose name matches the query first, then
+ * verified uploaders and popular tracks, then each source's own relevance order (as a tiebreak,
+ * interleaved so one catalog doesn't bury the other).
+ */
+export function rankTracks(query: string, tracks: Track[]): Track[] {
+  const rankInSource = new Map<string, number>();
+  const seen = new Map<string, number>();
+  for (const t of tracks) {
+    const n = seen.get(t.source) ?? 0;
+    rankInSource.set(t.key, n);
+    seen.set(t.source, n + 1);
+  }
+  const score = (t: Track) => {
+    const artistMatch = similarity(query, t.artist);
+    const titleMatch = similarity(query, t.title);
+    return (
+      (artistMatch >= 0.9 ? 3 : artistMatch * 0.8) +
+      titleMatch * 0.6 +
+      (t.artistVerified ? 0.6 : 0) +
+      Math.min(1, Math.log10(1 + (t.playCount ?? 0)) / 7) -
+      (rankInSource.get(t.key) ?? 0) * 0.02
+    );
+  };
+  const scored = tracks.map((t) => ({ t, s: score(t) }));
+  return scored.sort((a, b) => b.s - a.s).map((x) => x.t);
 }
 
 function pickTop(q: string, r: UnifiedSearchResult): TopResult | undefined {

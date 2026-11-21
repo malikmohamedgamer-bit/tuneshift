@@ -8,6 +8,7 @@ import {
   LocalAdapter,
   LrclibClient,
   SourceRegistry,
+  rankTracks,
   baseTitle,
   findVersions,
   isAudioFileName,
@@ -263,5 +264,40 @@ describe('local file helpers', () => {
       artist: 'Unknown artist',
       trackNo: undefined,
     });
+  });
+});
+
+describe('search ranking', () => {
+  const mk = (
+    id: string,
+    title: string,
+    artist: string,
+    playCount: number,
+    artistVerified?: boolean,
+  ): Track => ({
+    key: `audius:${id}`,
+    source: 'audius',
+    id,
+    title,
+    artist,
+    durationSec: 180,
+    playCount,
+    artistVerified,
+  });
+  it("puts the artist's own popular songs above fan flips that mention them", () => {
+    const ranked = rankTracks('skrillex', [
+      mk('1', 'SKRILLEX - XERECA NA VARA (bauti flip)', 'bauti', 8185),
+      mk('2', 'skrillex 7', 'um..', 2454),
+      mk('3', 'Kliptown Empyrean', 'Skrillex', 1_162_093, true),
+      mk('4', 'Skrillex - Kliptown Empyrean (Dabow Flip)', 'Dabow', 5087, true),
+    ]);
+    expect(ranked[0]?.artist).toBe('Skrillex');
+  });
+  it('prefers verified, popular uploads for a song title', () => {
+    const ranked = rankTracks('kliptown empyrean', [
+      mk('1', 'Kliptown Empyrean (cover)', 'someone', 12),
+      mk('2', 'Kliptown Empyrean', 'Skrillex', 1_162_093, true),
+    ]);
+    expect(ranked[0]?.id).toBe('2');
   });
 });

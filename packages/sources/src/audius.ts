@@ -32,6 +32,7 @@ const UserSchema = z.object({
   profile_picture: ArtworkSchema,
   bio: z.string().nullish(),
   follower_count: z.number().optional(),
+  is_verified: z.boolean().optional(),
   track_count: z.number().optional(),
 });
 
@@ -89,6 +90,7 @@ export function parseAudiusTrack(raw: unknown): Track | null {
     title: t.title,
     artist: t.user.name,
     artistId: t.user.id,
+    artistVerified: t.user.is_verified || undefined,
     durationSec: t.duration,
     artwork: artwork(t.artwork),
     genre: t.genre ?? undefined,
@@ -118,6 +120,7 @@ export function parseAudiusUser(raw: unknown): Artist | null {
     bio: u.bio ?? undefined,
     followerCount: u.follower_count,
     trackCount: u.track_count,
+    verified: u.is_verified || undefined,
     permalink: u.handle ? `${AUDIUS_WEB}/${u.handle}` : undefined,
   };
 }
