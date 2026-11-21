@@ -17,14 +17,14 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 
 ## Status
 
-- **Now:** P1 core + audio engine + local files
-- **Next:** P2 app shell + themes
-- **Done:** P0 (tooling, core package + 54 unit tests, env validation, CI + Pages workflows, icons)
+- **Now:** P2 app shell + themes (includes the UI half of P1: local file import, Sound Lab, My Sounds, A/B, visualizer, export UI)
+- **Next:** P3 sources UI (search, artist/album pages, lyrics)
+- **Done:** P1 engine/DSP (EffectChain, AudioEngine, LiveInputEngine, IRs, loudness, WAV/MP3 export, CORS probe, visualizer, 29 audio tests incl. OfflineAudioContext a–f), sources package (Audius/Jamendo/LRCLIB/local adapters, registry, remix finder, collections, MSW mocks, 15 tests), 3 original demo loops, E2E WAV fixture. P0 (tooling, core package + 54 unit tests, env validation, CI + Pages workflows, icons)
 
 ## Phases
 
 - [x] P0 Setup — monorepo, tooling, CLAUDE.md, CI, env validation + missing-key screen
-- [ ] P1 Core + audio engine + local files
+- [x] P1 Core + audio engine + local files (engine side; UI side ships in P2)
 - [ ] P2 App shell + themes
 - [ ] P3 Sources
 - [ ] P4 Player + library
@@ -41,12 +41,12 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 - [ ] SourceAdapter interface + registry (enable/disable without breakage)
 - [ ] Local: drag-drop, file picker, folder picker (FSA + webkitdirectory), handles in IndexedDB, OPFS copy + usage/delete
 - [ ] Local (desktop): watched folders, recursive scan, rescan, asset protocol playback with CORS
-- [ ] Demo tracks script (3 original loops) committed under apps/web/public/demo + "Demo" collection
+- [x] Demo tracks script (3 original loops) committed under apps/web/public/demo + "Demo" collection
 - [ ] music-metadata tags + cover art, filename fallback
-- [ ] Audius adapter (key-free, optional key)
-- [ ] Jamendo adapter (disabled until key; Add key card)
+- [x] Audius adapter (key-free, optional key)
+- [x] Jamendo adapter (disabled until key; Add key card)
 - [ ] Runtime API keys in Settings (validated, no rebuild)
-- [ ] LRCLIB lyrics (headers, 404, 429 Retry-After, IndexedDB cache)
+- [x] LRCLIB lyrics (headers, 404, 429 Retry-After, IndexedDB cache)
 - [ ] CORS probe per host + Limited mode + "Full Sound Lab"/"Speed only" badges
 - [ ] Unified search (grouped, filters, recent searches)
 - [ ] Remix Finder
@@ -54,14 +54,14 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 ### §4 Audio engine
 
 - [ ] AudioContext on first gesture + "Tap to start audio"
-- [ ] Full signal chain (decks, pitch worklet, preamp, 10-band EQ, bass, compressor, reverb, widener, 8D, lofi, vocal reduce, master, limiter, analyser)
-- [ ] Ramped params, 30 ms bypass crossfades, auto headroom + meter
-- [ ] Tape speed + independent pitch (signalsmith-stretch)
-- [ ] Generated reverb IRs (6 rooms, cached), pre-delay, tone
-- [ ] 8D via oscillators (HRTF), radius, height wobble
+- [x] Full signal chain (decks, pitch worklet, preamp, 10-band EQ, bass, compressor, reverb, widener, 8D, lofi, vocal reduce, master, limiter, analyser)
+- [x] Ramped params, 30 ms bypass crossfades, auto headroom + meter
+- [x] Tape speed + independent pitch (signalsmith-stretch)
+- [x] Generated reverb IRs (6 rooms, cached), pre-delay, tone
+- [x] 8D via oscillators (HRTF), radius, height wobble
 - [ ] Two decks, preload, equal-power crossfade 0–12 s, gapless
 - [ ] Loudness normalization (worker LUFS for local, RMS for remote, ReplayGain tags)
-- [ ] All Sound presets + EQ presets (exact values)
+- [x] All Sound presets + EQ presets (exact values)
 - [ ] My Sounds (save/rename/duplicate/delete/reorder/favourite/export/import/share)
 - [ ] Sound assignment song > playlist > global + active indicator + reset
 - [ ] A/B compare (hold button / B)
@@ -139,7 +139,7 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 ### §13 Tests
 
 - [ ] Vitest unit suites listed in §13
-- [ ] Audio OfflineAudioContext preset tests (a–f)
+- [x] Audio OfflineAudioContext preset tests (a–f)
 - [ ] Playwright E2E flow + axe
 - [ ] Rust cargo tests
 - [ ] CI on every push

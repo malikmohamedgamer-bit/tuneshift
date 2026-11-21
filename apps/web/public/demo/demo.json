@@ -1,0 +1,38 @@
+[
+  {
+    "id": "midnight-drift",
+    "file": "midnight-drift.mp3",
+    "cover": "midnight-drift.svg",
+    "title": "Midnight Drift",
+    "artist": "Tuneshift Demos",
+    "album": "Tuneshift Demos",
+    "genre": "Phonk",
+    "mood": "Aggressive",
+    "bpm": 130,
+    "durationSec": 44.9
+  },
+  {
+    "id": "paper-lanterns",
+    "file": "paper-lanterns.mp3",
+    "cover": "paper-lanterns.svg",
+    "title": "Paper Lanterns",
+    "artist": "Tuneshift Demos",
+    "album": "Tuneshift Demos",
+    "genre": "Lo-Fi",
+    "mood": "Peaceful",
+    "bpm": 80,
+    "durationSec": 46.5
+  },
+  {
+    "id": "neon-pluck",
+    "file": "neon-pluck.mp3",
+    "cover": "neon-pluck.svg",
+    "title": "Neon Pluck",
+    "artist": "Tuneshift Demos",
+    "album": "Tuneshift Demos",
+    "genre": "Electronic",
+    "mood": "Energizing",
+    "bpm": 124,
+    "durationSec": 45.3
+  }
+]

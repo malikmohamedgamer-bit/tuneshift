@@ -16,3 +16,23 @@
 - Audius works key-free (`app_name=Tuneshift`, verified live 2026-11-21: trending, search and stream 200, stream redirect chain sends `Access-Control-Allow-Origin: *`) — ships enabled; optional key is sent as `api_key` query param.
 - Audius stream URL = `https://api.audius.co/v1/tracks/{id}/stream?app_name=Tuneshift` (re-signed on every request) — the final storage URL expires after 300 s, so we never cache it; retry adds a cache-buster.
 - Jamendo ships disabled until a client_id is pasted (verified: API returns "Invalid Client Id" without one).
+
+## Hosting
+- GitHub Pages cannot be enabled: the account is on GitHub Free, which only serves Pages from public repos, and the spec asks for a private repo — I did not make anything public. `pages.yml` checks whether Pages is on and skips green until it is; LATER.md has the one-step fix.
+
+## Audio engine
+- Pitch shifter: `signalsmith-stretch` 1.3.2 (MIT, WASM AudioWorklet; verified API from its README/source) — first choice per spec; it loads its worklet from a blob: URL, so where CSP blocks that the chain reports "pitch unavailable" instead of failing.
+- MP3 encoder: `@breezystack/lamejs` 1.2.7 — maintained ESM/TS fork of lamejs (the original npm `lamejs` 1.2.1 has the MPEGMode bug and no ESM).
+- Limiter (spec values) + a static soft clipper after it (linear to 0.9, ceiling 0.935 ≈ −0.58 dBFS) — DynamicsCompressor at 20:1 can still overshoot −0.5 dBFS on hot transients; the clipper guarantees the ceiling without touching normal material.
+- Stage bypass = parallel dry/wet gains crossfaded over 30 ms (setTargetAtTime τ=10 ms); heavy branches (convolver, HRTF panner, worklet, lo-fi) are disconnected 250 ms after going silent to save CPU, reconnected before fading in — no topology change while audible.
+- Chain input is a 2-channel "speakers" up-mix GainNode — otherwise ChannelSplitter (discrete) would put mono files on the left only through the M/S stages.
+- Reverb room changes crossfade between two ConvolverNodes (A/B) to avoid clicks when the IR buffer changes.
+- Vocal reduce keeps < 150 Hz intact via an LR4 crossover and cancels the centre above it (keeps the bass/kick).
+- 8D in offline export uses the same OscillatorNodes (they render fine in OfflineAudioContext), so no separate automation curve was needed.
+- Export of independent-pitch sounds: the buffer source's playbackRate shifts pitch too, so the worklet is given `pitchSemitones − 12·log2(speed)`.
+- Limited mode uses a second, unrouted <audio> per deck (an element can never be un-routed once createMediaElementSource is called); Background-safe mode hands playback between the two elements on visibility changes.
+- CORS probe = `fetch(url, {mode:'cors', Range: bytes=0-1})` per host (follows redirects, cached 7 days) + element-error fallback — equivalent to the spec's HEAD/range check and cheaper than an analyser probe.
+- Live inputs (desktop Boost, extension): tempo can't change, so tape-style speed is turned into the equivalent worklet pitch shift (Nightcore still sounds higher, just not faster).
+- Auto headroom = −(peak EQ+bass boost − 6 dB) when the peak exceeds +6 dB, computed analytically from the Web Audio biquad formulas (same maths draws the EQ curve).
+- Demo loops synthesised in Node by `scripts/synth.ts` (our own oscillators/envelopes, no samples) and encoded at 112 kbps MP3 with lamejs.
+- P1's UI half (file import screens, Sound Lab controls, My Sounds UI, visualizer UI, export dialog) ships with the P2 app shell instead of a throwaway P1 UI — avoids building the screens twice.
