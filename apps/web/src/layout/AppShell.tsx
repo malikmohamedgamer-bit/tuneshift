@@ -19,15 +19,20 @@ import { useActiveTheme } from '../state/theme';
 import { importItems, type ImportItem } from '../lib/localFiles';
 import { db } from '../db/db';
 import { InstallBanner } from '../components/InstallBanner';
+import { isTauri } from '../platform/detect';
+import { setNavigator } from '../lib/nav';
 import { onPlayerEvent } from '../player/events';
+// Ask is already in the shell chunk (TransportBar uses it), so its host is imported statically.
+import { AskHost } from '../components/Ask';
 
 // Non-critical UI loads after first paint (keeps the shell's first-load JS small).
+// Desktop-only frameless title bar: never part of the web bundle's critical path.
+const LazyTitleBar = lazy(async () => ({
+  default: (await import('../platform/windows/TitleBar')).TitleBar,
+}));
 const LazyFullPlayer = lazy(async () => ({ default: (await import('./FullPlayer')).FullPlayer }));
 const LazyDeferredUi = lazy(async () => {
-  const [{ GlobalDialogs }, { AskHost }] = await Promise.all([
-    import('./GlobalDialogs'),
-    import('../components/Ask'),
-  ]);
+  const { GlobalDialogs } = await import('./GlobalDialogs');
   return {
     default: () => (
       <>
@@ -268,6 +273,11 @@ function Frame({ children }: { children: ReactNode }) {
   const compact = layout === 'compact';
   return (
     <div className="flex h-full flex-col">
+      {isTauri() && (
+        <Suspense fallback={<div className="h-9 shrink-0 bg-bg" data-tauri-drag-region />}>
+          <LazyTitleBar />
+        </Suspense>
+      )}
       <div className="flex min-h-0 flex-1 gap-2 p-0 md:p-2">
         <div className="hidden md:flex">
           <Sidebar compact={compact} />
@@ -310,6 +320,7 @@ function Frame({ children }: { children: ReactNode }) {
 
 export function AppShell() {
   const nav = useNavigate();
+  useEffect(() => setNavigator((to) => void nav(to)), [nav]);
   const onboarded = useSettings((s) => s.onboarded);
   const location = useLocation();
   useEffect(() => {
@@ -349,7 +360,7 @@ export function AppShell() {
       <DropZone />
       <TapToStart />
       <Announcer />
-      <InstallBanner />
+      {!isTauri() && <InstallBanner />}
       <Toaster
         theme="dark"
         position="top-center"

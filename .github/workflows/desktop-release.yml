@@ -1,0 +1,65 @@
+name: Desktop release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to create/update (e.g. v0.1.0)
+        required: true
+        default: v0.1.0
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Windows installer (NSIS) + extension zip
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+      - run: pnpm install --frozen-lockfile
+      - name: Build the Tuneshift Boost extension
+        if: hashFiles('apps/extension/manifest.json') != ''
+        run: pnpm ext:build
+      - name: Build and publish the installer (draft release)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/desktop
+          tagName: ${{ env.TAG }}
+          releaseName: Tuneshift ${{ env.TAG }}
+          releaseBody: |
+            **Windows:** download the `Tuneshift_*_x64-setup.exe` installer below. It's unsigned, so
+            Windows SmartScreen may warn: click **More info → Run anyway**.
+
+            **Browser extension (Chrome/Edge):** download `tuneshift-boost-extension.zip`, unzip it,
+            open `chrome://extensions` (or `edge://extensions`), turn on Developer mode and choose
+            **Load unpacked** → the unzipped folder.
+          releaseDraft: true
+          prerelease: false
+          args: --bundles nsis
+      - name: Attach the extension zip
+        if: hashFiles('tuneshift-boost-extension.zip') != ''
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$TAG" tuneshift-boost-extension.zip --clobber

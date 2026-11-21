@@ -12,7 +12,6 @@ import {
 } from '../components/common';
 import { LikeButton } from '../components/LikeButton';
 import { PresetBadge, PresetChips } from '../components/player/PlayerControls';
-import { LyricsView } from '../components/player/LyricsView';
 import { VisualizerCanvas } from '../components/player/VisualizerCanvas';
 import { usePlayer } from '../state/player';
 import { useSettings } from '../state/settings';
@@ -20,6 +19,10 @@ import { useUi, type NowTab } from '../state/ui';
 
 const QueueView = lazy(async () => ({
   default: (await import('../components/player/QueueView')).QueueView,
+}));
+
+const LyricsView = lazy(async () => ({
+  default: (await import('../components/player/LyricsView')).LyricsView,
 }));
 
 const tabCls =
@@ -143,7 +146,9 @@ export function NowPlayingPanel() {
               </Suspense>
             </Tabs.Content>
             <Tabs.Content value="lyrics" className="min-h-0 flex-1 overflow-hidden pt-2">
-              <LyricsView track={current} />
+              <Suspense fallback={<p className="text-sm text-muted">Loading lyrics…</p>}>
+                <LyricsView track={current} />
+              </Suspense>
             </Tabs.Content>
             <Tabs.Content value="info" className="min-h-0 flex-1 overflow-y-auto pt-2 text-sm">
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">

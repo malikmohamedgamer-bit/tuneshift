@@ -1,7 +1,11 @@
+import { isTauri } from './detect';
+
 /**
- * Platform start-up hook. The desktop (Tauri) bridge is added here in phase 7; the web build
- * needs nothing extra at start-up (the PWA service worker registers from main.tsx).
+ * Platform start-up: inside the desktop app the Tauri bridge (windows, tray, shortcuts, deep
+ * links, Discord) is loaded lazily, so the web bundle never pulls it in.
  */
 export async function startPlatform(): Promise<void> {
-  await Promise.resolve();
+  if (!isTauri()) return;
+  const { startDesktop } = await import('./tauri');
+  await startDesktop();
 }

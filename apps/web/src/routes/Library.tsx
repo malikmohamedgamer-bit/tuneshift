@@ -84,29 +84,44 @@ export async function runImport(
   return res.added;
 }
 
+/** Desktop: pick audio files with the native dialog and add them (played via the asset protocol). */
+async function desktopAddFiles(): Promise<void> {
+  const { open } = await import('@tauri-apps/plugin-dialog');
+  const picked = await open({
+    multiple: true,
+    filters: [{ name: 'Audio', extensions: ['mp3', 'm4a', 'aac', 'flac', 'wav', 'ogg', 'opus'] }],
+  });
+  const paths = Array.isArray(picked) ? picked : picked ? [picked] : [];
+  if (!paths.length) return;
+  const { openDesktopFiles } = await import('../platform/desktopLibrary');
+  const added = await openDesktopFiles(paths);
+  toast.success(`Added ${added.length} song${added.length === 1 ? '' : 's'}`);
+}
+
 export function AddMusicButtons({ compact }: { compact?: boolean }) {
-  const nav = useNavigate();
   const desktop = isTauri();
+  const addFolder = async () => {
+    if (desktop) {
+      const { addWatchedFolder } = await import('../platform/desktopLibrary');
+      await addWatchedFolder();
+    } else await runImport(async () => (await pickFolder()).items, 'Scanning folder');
+  };
   return (
     <div className="flex flex-wrap gap-2">
       <Button
         variant="primary"
         size={compact ? 'sm' : 'md'}
         icon={<Upload size={16} />}
-        onClick={() => void runImport(pickFiles)}
+        onClick={() => void (desktop ? desktopAddFiles() : runImport(pickFiles))}
       >
         Add files
       </Button>
       <Button
         size={compact ? 'sm' : 'md'}
         icon={<FolderOpen size={16} />}
-        onClick={() =>
-          void (desktop
-            ? nav('/settings/sources')
-            : runImport(async () => (await pickFolder()).items, 'Scanning folder'))
-        }
+        onClick={() => void addFolder()}
       >
-        {desktop ? 'Watched folders' : 'Add folder'}
+        {desktop ? 'Add watched folder' : 'Add folder'}
       </Button>
     </div>
   );
@@ -487,6 +502,11 @@ function FoldersTab() {
   }, [tracks]);
   const [open, setOpen] = useState<string | null>(null);
   const rescan = async (f: LocalFolderRecord) => {
+    if (f.kind === 'tauri') {
+      const { rescanDesktopFolder } = await import('../platform/desktopLibrary');
+      await rescanDesktopFolder(f);
+      return;
+    }
     const id = toast.loading(`Rescanning ${f.name}…`);
     try {
       const r = await rescanFolder(f);
