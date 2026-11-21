@@ -99,3 +99,20 @@ export function qs(params: Record<string, string | number | boolean | undefined>
   for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== '') p.set(k, String(v));
   return p.toString();
 }
+
+/** Simple concurrency limiter so a busy screen doesn't burst past an API's rate limit. */
+export class Semaphore {
+  private active = 0;
+  private readonly waiting: (() => void)[] = [];
+  constructor(private readonly max: number) {}
+  async run<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.active >= this.max) await new Promise<void>((r) => this.waiting.push(r));
+    this.active++;
+    try {
+      return await fn();
+    } finally {
+      this.active--;
+      this.waiting.shift()?.();
+    }
+  }
+}

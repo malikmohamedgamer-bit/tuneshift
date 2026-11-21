@@ -36,6 +36,18 @@
     </style>
   </head>
   <body>
+    <script>
+      // Safe-theme escape hatch: remember if Shift is held while the app boots.
+      (function () {
+        var on = function (e) {
+          if (e.key === 'Shift') window.__tsShift = true;
+        };
+        window.addEventListener('keydown', on);
+        setTimeout(function () {
+          window.removeEventListener('keydown', on);
+        }, 1500);
+      })();
+    </script>
     <div id="root"><div id="boot">Loading Tuneshift…</div></div>
     <noscript>Tuneshift needs JavaScript to run.</noscript>
     <script type="module" src="./src/main.tsx"></script>

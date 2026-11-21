@@ -1,3 +1,5 @@
+import type { SoundSettings } from './sound';
+
 /** Shared domain types used by every package and app. DOM-free. */
 
 export type SourceId = 'local' | 'audius' | 'jamendo';
@@ -18,6 +20,8 @@ export interface Artwork {
   small?: string;
   medium?: string;
   large?: string;
+  /** Alternate hosts serving the same paths (Audius content nodes). */
+  mirrors?: string[];
 }
 
 export interface TrackLicense {
@@ -162,3 +166,27 @@ export interface HistoryEntry extends SyncMeta {
 }
 
 export const LOCAL_ONLY_MARKER = 'local-only';
+
+/** A sound reference: a built-in preset or one of the user's saved sounds. */
+export type SoundRef = { kind: 'preset'; id: string } | { kind: 'saved'; id: string };
+
+export interface SavedSound extends SyncMeta {
+  id: string;
+  name: string;
+  /** Stored as plain JSON (validated with migrateSound on read). */
+  settings: SoundSettings;
+  favourite: boolean;
+  order: number;
+  createdAt: number;
+}
+
+/** "Always play this song/playlist with X" (spec §4.6). id = `track:<key>` | `playlist:<id>`. */
+export interface SoundAssignment extends SyncMeta {
+  id: string;
+  ref: SoundRef;
+}
+
+export interface LyricsOffset extends SyncMeta {
+  id: string; // track key
+  offsetMs: number;
+}

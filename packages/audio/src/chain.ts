@@ -174,6 +174,8 @@ export class EffectChain {
   /** Connect this to the destination. */
   readonly output: GainNode;
   readonly analyser: AnalyserNode;
+  /** Pre-effects tap (loudness estimate for normalisation of remote streams). */
+  readonly inputAnalyser: AnalyserNode;
 
   private readonly realtime: boolean;
   private settings: SoundSettings = neutralSound();
@@ -249,6 +251,8 @@ export class EffectChain {
     this.ctx = ctx;
     this.realtime = typeof AudioContext !== 'undefined' && ctx instanceof AudioContext;
     this.input = stereoGain(ctx);
+    this.inputAnalyser = new AnalyserNode(ctx, { fftSize: 2048, smoothingTimeConstant: 0 });
+    this.input.connect(this.inputAnalyser);
 
     // Pitch (bypassed unless independent mode with a non-zero shift).
     this.pitchSend = stereoGain(ctx);

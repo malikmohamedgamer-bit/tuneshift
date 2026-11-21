@@ -284,3 +284,22 @@ export function allTrackKeys(state: QueueState): string[] {
   for (const i of [...state.manual, ...state.context, ...state.autoplay]) keys.add(i.trackKey);
   return [...keys];
 }
+
+/** Apply a new order (by uid) to one section — used by drag-and-drop reordering. */
+export function setSectionOrder(
+  state: QueueState,
+  section: QueueSection,
+  uids: readonly string[],
+): QueueState {
+  const reorder = (items: QueueItem[]): QueueItem[] => {
+    const map = new Map(items.map((i) => [i.uid, i]));
+    const out = uids.map((u) => map.get(u)).filter((i): i is QueueItem => Boolean(i));
+    for (const i of items) if (!uids.includes(i.uid)) out.push(i);
+    return out;
+  };
+  if (section === 'manual') return { ...state, manual: reorder(state.manual) };
+  if (section === 'autoplay') return { ...state, autoplay: reorder(state.autoplay) };
+  const base = state.index + 1;
+  const context = [...state.context.slice(0, base), ...reorder(state.context.slice(base))];
+  return { ...state, context, original: state.shuffle === 'off' ? context : state.original };
+}

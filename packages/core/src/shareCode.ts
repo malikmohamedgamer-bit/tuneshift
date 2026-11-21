@@ -95,6 +95,11 @@ export function decodeShareCode(input: string): SharePayload {
   } catch {
     throw new ShareCodeError('This code looks damaged (could not unpack)');
   }
+  return validateSharePayload(kind, raw);
+}
+
+/** Validate an untrusted payload of a given kind (offline codes and server-side short codes). */
+export function validateSharePayload(kind: ShareKind, raw: unknown): SharePayload {
   if (kind === 'sound') {
     const obj = raw as { name?: unknown; settings?: unknown };
     const parsed = SharedSoundSchema.safeParse({
@@ -102,16 +107,16 @@ export function decodeShareCode(input: string): SharePayload {
       settings: obj?.settings ? migrateSound(obj.settings) : undefined,
     });
     if (!parsed.success) throw new ShareCodeError('Invalid sound in code');
-    return { kind, data: parsed.data as SharedSound };
+    return { kind: 'sound', data: parsed.data as SharedSound };
   }
   if (kind === 'theme') {
     const parsed = ThemeSchema.safeParse(raw);
     if (!parsed.success) throw new ShareCodeError('Invalid theme in code');
-    return { kind, data: { ...(parsed.data as Theme), builtIn: false } };
+    return { kind: 'theme', data: { ...(parsed.data as Theme), builtIn: false } };
   }
   const parsed = SharedPlaylistSchema.safeParse(raw);
   if (!parsed.success) throw new ShareCodeError('Invalid playlist in code');
-  return { kind, data: parsed.data as SharedPlaylist };
+  return { kind: 'playlist', data: parsed.data as SharedPlaylist };
 }
 
 export function isOfflineShareCode(s: string): boolean {

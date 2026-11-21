@@ -8,7 +8,7 @@ import {
   type Track,
 } from '@tuneshift/core';
 import { z } from 'zod';
-import { fetchJson, qs, SourceError } from './http';
+import { fetchJson, qs, Semaphore, SourceError } from './http';
 import type { SearchOptions, SourceAdapter, TrendingOptions } from './types';
 
 export const AUDIUS_API = 'https://api.audius.co/v1';
@@ -20,6 +20,7 @@ const ArtworkSchema = z
     '150x150': z.string().optional(),
     '480x480': z.string().optional(),
     '1000x1000': z.string().optional(),
+    mirrors: z.array(z.string()).optional(),
   })
   .partial()
   .nullish();
@@ -68,6 +69,7 @@ type APlaylist = z.infer<typeof PlaylistSchema>;
 function artwork(a: z.infer<typeof ArtworkSchema>): Artwork | undefined {
   if (!a) return undefined;
   const out: Artwork = { small: a['150x150'], medium: a['480x480'], large: a['1000x1000'] };
+  if (a.mirrors?.length) out.mirrors = a.mirrors.slice(0, 3);
   return out.small || out.medium || out.large ? out : undefined;
 }
 
@@ -158,6 +160,9 @@ export class AudiusAdapter implements SourceAdapter {
   readonly displayName = 'Audius';
   readonly capabilities = { fullEffects: true, tapeSpeed: true, export: false, shareable: true };
 
+  /** Audius free tier allows ~10 req/s; keep at most 4 requests in flight. */
+  private readonly slots = new Semaphore(4);
+
   constructor(private readonly opts: AudiusOptions = {}) {}
 
   private auth(): Record<string, string> {
@@ -169,13 +174,15 @@ export class AudiusAdapter implements SourceAdapter {
     path: string,
     params: Record<string, string | number | undefined> = {},
     signal?: AbortSignal,
-  ) {
-    return fetchJson<T>(`${AUDIUS_API}${path}?${qs({ ...params, ...this.auth() })}`, {
-      source: 'Audius',
-      fetchImpl: this.opts.fetchImpl,
-      retryOn429: true,
-      signal,
-    });
+  ): Promise<T> {
+    return this.slots.run(() =>
+      fetchJson<T>(`${AUDIUS_API}${path}?${qs({ ...params, ...this.auth() })}`, {
+        source: 'Audius',
+        fetchImpl: this.opts.fetchImpl,
+        retryOn429: true,
+        signal,
+      }),
+    );
   }
 
   async search(q: string, opts: SearchOptions): Promise<SearchPage> {

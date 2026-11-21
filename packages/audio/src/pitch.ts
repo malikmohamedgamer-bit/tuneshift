@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference -- ambient types for an untyped dependency; must load when other packages compile this file
+/// <reference path="./signalsmith.d.ts" />
 import type { StretchNode } from 'signalsmith-stretch';
 
 export type { StretchNode };

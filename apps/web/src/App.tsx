@@ -1,57 +1,28 @@
-import { useSyncExternalStore } from 'react';
-import { envIssues, getKeys, keySource, subscribeKeys, type KeyName } from './env';
-
-const KEYS: { name: KeyName; label: string; enables: string; required: boolean }[] = [
-  {
-    name: 'audiusApiKey',
-    label: 'Audius API key',
-    enables: 'Higher Audius rate limits (Audius works without it)',
-    required: false,
-  },
-  {
-    name: 'jamendoClientId',
-    label: 'Jamendo client ID',
-    enables: 'The Jamendo Creative Commons catalog',
-    required: false,
-  },
-  {
-    name: 'supabaseUrl',
-    label: 'Supabase URL',
-    enables: 'Sign-in, sync and friends',
-    required: false,
-  },
-  {
-    name: 'supabaseAnonKey',
-    label: 'Supabase anon key',
-    enables: 'Sign-in, sync and friends',
-    required: false,
-  },
-];
+import { useEffect, useMemo } from 'react';
+import { RouterProvider } from 'react-router/dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './lib/queryClient';
+import { startSocial } from './lib/socialBoot';
+import { makeRouter } from './router';
+import { player } from './player/controller';
+import { loadDemoTracks } from './lib/demo';
+import { startPlatform } from './platform';
 
 export function App() {
-  useSyncExternalStore(subscribeKeys, getKeys);
+  const router = useMemo(() => makeRouter(), []);
+  useEffect(() => {
+    player.init();
+    // Dev-only debugging handle (never in production builds).
+    if (import.meta.env.DEV)
+      (window as unknown as { __tuneshift?: unknown }).__tuneshift = { player };
+    void loadDemoTracks().catch((e: unknown) => console.warn('[demo]', e));
+    void player.restore();
+    void startPlatform();
+    void startSocial();
+  }, []);
   return (
-    <main className="mx-auto max-w-2xl p-6">
-      <h1 className="text-gradient text-4xl font-bold">Tuneshift</h1>
-      <p className="mt-2 text-muted">Setup check — every key is optional.</p>
-      {envIssues.length > 0 && (
-        <div role="alert" className="mt-4 rounded-ctl border border-line bg-surface p-4">
-          {envIssues.map((i) => (
-            <p key={i.variable}>
-              <code>{i.variable}</code> {i.message}; it is ignored.
-            </p>
-          ))}
-        </div>
-      )}
-      <ul className="mt-6 space-y-2">
-        {KEYS.map((k) => (
-          <li key={k.name} className="rounded-ctl bg-surface p-3">
-            <strong>{k.label}</strong> —{' '}
-            {keySource(k.name) === 'missing' ? 'not set' : `set (${keySource(k.name)})`}
-            <div className="text-sm text-muted">{k.enables}</div>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   );
 }
