@@ -136,7 +136,7 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 - [x] Desktop: main window (title bar, state, tray-close), mini player, overlay, tray, global shortcuts, single instance, autostart, deep links, file associations
 - [x] Desktop: Discord RPC, Boost mode (wizard, capture, latency, meter), SMTC, WebView2 permission
 - [x] Desktop: icons, NSIS, release workflow
-- [ ] Desktop: v0.1.0 tag → draft release built
+- [x] Desktop: v0.1.0 tag → draft release built (installer + extension zip)
 - [x] Extension: tab capture boost (multi-tab, badge, cleanup), popup, My Sounds sync, share-code import, speed content script, zip
 
 ### §13 Tests
