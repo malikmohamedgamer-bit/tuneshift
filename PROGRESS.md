@@ -132,7 +132,7 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 ### §11 Platforms
 
 - [x] PWA (offline shell, install prompt, update toast, Background-safe mode)
-- [ ] GitHub Pages deploy (base, 404 fallback, scope)
+- [x] GitHub Pages deploy (base, 404 fallback, scope) — live at https://malikmohamedgamer-bit.github.io/tuneshift/ with Jamendo + Supabase keys
 - [x] Desktop: main window (title bar, state, tray-close), mini player, overlay, tray, global shortcuts, single instance, autostart, deep links, file associations
 - [x] Desktop: Discord RPC, Boost mode (wizard, capture, latency, meter), SMTC, WebView2 permission
 - [x] Desktop: icons, NSIS, release workflow

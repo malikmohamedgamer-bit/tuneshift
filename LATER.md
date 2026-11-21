@@ -1,16 +1,18 @@
 # LATER — things only you can do
 
+**Status (2026-11-21):** keys, Supabase, Pages, desktop install and extension are done ✅. Left: optional Discord + VB-Cable, and the manual tests.
+
 Everything here needs a sign-in, a click in a browser, an admin prompt or a decision. The app works without any of it: local files, the bundled demo tracks and Audius (no key needed) play with the full Sound Lab today.
 
 ## 1. Free keys (5 minutes)
 
-- [ ] **Jamendo client_id** (turns on Jamendo search and the Jamendo half of Browse)
+- [x] **Jamendo client_id** (turns on Jamendo search and the Jamendo half of Browse)
   1. Open https://devportal.jamendo.com and sign up (free, non-commercial).
   2. "My Applications" → "Add application" → any name, e.g. Tuneshift.
   3. Copy the **Client ID**.
   4. Paste it in the app: **Settings → Sources → API keys → Jamendo client ID**. It works at once on that device.
   5. Optional, for every device / the hosted site: GitHub → tuneshift repo → **Settings → Secrets and variables → Actions → New repository secret**, name `VITE_JAMENDO_CLIENT_ID`.
-- [ ] **Audius API key** (optional — Audius already works without one; a key only raises rate limits)
+- [x] **Audius API key** (optional — Audius already works without one; a key only raises rate limits)
   1. https://audius.org/settings → "Developer apps" → create an app → copy the API key.
   2. **Settings → Sources → API keys → Audius API key**, or the GitHub secret `VITE_AUDIUS_API_KEY`.
 
@@ -18,19 +20,19 @@ Everything here needs a sign-in, a click in a browser, an admin prompt or a deci
 
 All the code and the database migration are ready; it only needs a project.
 
-- [ ] Create the project
+- [x] Create the project
   1. https://supabase.com → sign in → **New project** (Free plan), any name, pick a region near you, save the database password somewhere safe.
-- [ ] Apply the database
+- [x] Apply the database
   1. Project → **SQL Editor** → New query.
   2. Paste the whole file `supabase/migrations/20261121000000_init.sql` from the repo → **Run**. (Optional: run `supabase/seed.sql` too.)
-- [ ] Auth settings
+- [x] Auth settings
   1. **Authentication → URL Configuration** → Site URL: `https://malikmohamedgamer-bit.github.io/tuneshift/`
   2. Redirect URLs — add all of:
      - `https://malikmohamedgamer-bit.github.io/tuneshift/auth/callback`
      - `http://localhost:5173/auth/callback`
      - `tuneshift://auth`
   3. **Authentication → Providers**: Email (magic link) is on by default. Google/Discord are optional and need their own OAuth apps.
-- [ ] Connect the app
+- [x] Connect the app
   1. Project → **Settings → API** → copy the **Project URL** and the **anon / publishable** key. Never copy the service-role key.
   2. In the app: **Settings → Account → Server (Supabase)** → paste the project URL and the anon key.
   3. For the hosted site: add GitHub secrets `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
@@ -39,14 +41,14 @@ All the code and the database migration are ready; it only needs a project.
 
 The repo is private, and GitHub's Free plan only serves Pages from public repos. The deploy workflow is ready and skips itself until Pages is on.
 
-- [ ] Either make the repo public (**Settings → General → Danger Zone → Change visibility**), or upgrade the account.
-- [ ] **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-- [ ] **Actions → "Deploy web app to GitHub Pages" → Run workflow** (or push any commit).
-- [ ] Open https://malikmohamedgamer-bit.github.io/tuneshift/ → finish onboarding → play a demo track with a few presets.
+- [x] Either make the repo public (**Settings → General → Danger Zone → Change visibility**), or upgrade the account.
+- [x] **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+- [x] **Actions → "Deploy web app to GitHub Pages" → Run workflow** (or push any commit).
+- [x] Open https://malikmohamedgamer-bit.github.io/tuneshift/ → finish onboarding → play a demo track with a few presets.
 
 ## 4. Windows desktop app
 
-- [ ] Install it
+- [x] Install it
   1. GitHub → tuneshift → **Releases** → draft **Tuneshift v0.1.0** → **Publish release** (drafts are only visible to you).
   2. Download `Tuneshift_0.1.0_x64-setup.exe` and run it. It installs just for you — no admin prompt.
   3. It isn't code-signed (that costs money), so SmartScreen may say "Windows protected your PC": click **More info → Run anyway**.
@@ -63,9 +65,9 @@ The repo is private, and GitHub's Free plan only serves Pages from public repos.
 
 ## 5. Browser extension (Chrome / Edge)
 
-- [ ] Download `tuneshift-boost-extension.zip` from the same release (or from the latest CI run's artifacts) and unzip it to a folder you'll keep.
-- [ ] Open `chrome://extensions` (Edge: `edge://extensions`) → turn on **Developer mode** → **Load unpacked** → choose the unzipped folder.
-- [ ] Pin it (puzzle icon → pin). Open a tab playing audio → click the icon → **Boost this tab**.
+- [x] Download `tuneshift-boost-extension.zip` from the same release (or from the latest CI run's artifacts) and unzip it to a folder you'll keep.
+- [x] Open `chrome://extensions` (Edge: `edge://extensions`) → turn on **Developer mode** → **Load unpacked** → choose the unzipped folder.
+- [x] Pin it (puzzle icon → pin). Open a tab playing audio → click the icon → **Boost this tab**.
 - [ ] Optional: change the keyboard shortcut at `chrome://extensions/shortcuts` (default Alt+Shift+B).
 
 ## 6. Things I couldn't verify myself (please try once)
