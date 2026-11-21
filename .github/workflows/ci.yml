@@ -34,6 +34,12 @@ jobs:
         if: hashFiles('apps/extension/manifest.json') != ''
         run: pnpm ext:build
       - uses: actions/upload-artifact@v4
+        if: success() && hashFiles('tuneshift-boost-extension.zip') != ''
+        with:
+          name: tuneshift-boost-extension
+          path: tuneshift-boost-extension.zip
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
@@ -59,15 +65,10 @@ jobs:
         run: mkdir -p apps/web/dist-desktop && echo '<!doctype html><title>ci</title>' > apps/web/dist-desktop/index.html
       - name: cargo check
         working-directory: apps/desktop/src-tauri
-        run: cargo check --all-targets
+        run: cargo check --locked --all-targets
       - name: cargo clippy
         working-directory: apps/desktop/src-tauri
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --locked --all-targets -- -D warnings
       - name: cargo test
         working-directory: apps/desktop/src-tauri
-        run: cargo test
-      - name: Upload Cargo.lock
-        uses: actions/upload-artifact@v4
-        with:
-          name: cargo-lock
-          path: apps/desktop/src-tauri/Cargo.lock
+        run: cargo test --locked
