@@ -50,6 +50,7 @@ import {
 } from '../lib/localFiles';
 import { useHistory } from '../lib/queries';
 import { player } from '../player/controller';
+import { confirmAction } from '../components/Ask';
 import { isTauri, supportsFileSystemAccess } from '../platform/detect';
 
 type Tab = 'playlists' | 'songs' | 'albums' | 'artists' | 'folders' | 'history';
@@ -595,10 +596,16 @@ function HistoryTab() {
           variant="ghost"
           icon={<Trash2 size={15} />}
           disabled={!history.length}
-          onClick={() => {
-            if (window.confirm('Clear your whole listening history? Stats and Wrapped will reset.'))
-              void clearHistory().then(() => toast.success('History cleared'));
-          }}
+          onClick={() =>
+            void confirmAction({
+              title: 'Clear listening history?',
+              body: 'Stats, Wrapped and Made for you will start over. This can’t be undone.',
+              confirmLabel: 'Clear history',
+              danger: true,
+            }).then((ok) => {
+              if (ok) void clearHistory().then(() => toast.success('History cleared'));
+            })
+          }
         >
           Clear history
         </Button>

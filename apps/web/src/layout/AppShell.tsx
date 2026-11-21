@@ -20,6 +20,8 @@ import { useUi } from '../state/ui';
 import { useActiveTheme } from '../state/theme';
 import { importItems, type ImportItem } from '../lib/localFiles';
 import { db } from '../db/db';
+import { AskHost } from '../components/Ask';
+import { onPlayerEvent } from '../player/events';
 
 /** Applies the active theme (+ adaptive accent, text scale, motion) whenever inputs change. */
 function ThemeController() {
@@ -270,6 +272,14 @@ export function AppShell() {
   useEffect(() => {
     document.getElementById('main-scroll')?.scrollTo({ top: 0 });
   }, [location.pathname]);
+  useEffect(
+    () =>
+      onPlayerEvent('track', () => {
+        if (useSettings.getState().lyricsAutoOpen)
+          useUi.getState().set({ nowPanelOpen: true, nowTab: 'lyrics' });
+      }),
+    [],
+  );
   return (
     <TooltipProvider>
       <ThemeController />
@@ -288,6 +298,7 @@ export function AppShell() {
       <DropZone />
       <TapToStart />
       <Announcer />
+      <AskHost />
       <Toaster
         theme="dark"
         position="top-center"

@@ -466,6 +466,7 @@ async function pull(sb: SupabaseClient, uid: string): Promise<number> {
 }
 
 let running: Promise<void> | null = null;
+let hooked = false;
 let timer: ReturnType<typeof setInterval> | null = null;
 let debounce: ReturnType<typeof setTimeout> | null = null;
 
@@ -498,10 +499,13 @@ export function startSync(): void {
   if (!timer) {
     timer = setInterval(() => void syncNow(), 120_000);
     window.addEventListener('online', onOnline);
-    db.syncQueue.hook('creating', () => {
-      if (debounce) clearTimeout(debounce);
-      debounce = setTimeout(() => void syncNow(), 4000);
-    });
+    if (!hooked) {
+      hooked = true;
+      db.syncQueue.hook('creating', () => {
+        if (debounce) clearTimeout(debounce);
+        debounce = setTimeout(() => void syncNow(), 4000);
+      });
+    }
   }
 }
 

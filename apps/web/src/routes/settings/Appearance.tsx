@@ -25,6 +25,7 @@ import {
   useAllThemes,
 } from '../../state/theme';
 import { downloadBlob } from '../../lib/images';
+import { askText } from '../../components/Ask';
 import { publicSiteUrl } from '../../env';
 
 function Swatch({
@@ -333,7 +334,11 @@ export function AppearanceSection() {
     toast.success('Theme link copied');
   };
   const importCode = async () => {
-    const raw = window.prompt('Paste a theme code or link');
+    const raw = await askText({
+      title: 'Add a shared theme',
+      label: 'Paste a theme code or link',
+      placeholder: 'ts1.t.… or https://…/s/…',
+    });
     if (!raw) return;
     try {
       const p = decodeShareCode(raw);

@@ -19,6 +19,7 @@ import {
   VolumeControl,
 } from '../components/player/PlayerControls';
 import { player } from '../player/controller';
+import { askText } from '../components/Ask';
 import { usePlayer } from '../state/player';
 import { useUi } from '../state/ui';
 
@@ -54,11 +55,18 @@ export function SleepMenu() {
           ))}
           <DropdownMenu.Item
             className={itemCls}
-            onSelect={() => {
-              const v = window.prompt('Stop playback after how many minutes?', '20');
-              const n = Number(v);
-              if (v && Number.isFinite(n) && n > 0 && n <= 600) set('time', n);
-            }}
+            onSelect={() =>
+              void askText({
+                title: 'Custom sleep timer',
+                label: 'Stop playback after (minutes)',
+                initial: '20',
+                inputMode: 'numeric',
+                validate: (v) => {
+                  const n = Number(v);
+                  return Number.isFinite(n) && n > 0 && n <= 600 ? null : 'Enter 1–600 minutes';
+                },
+              }).then((v) => v && set('time', Number(v)))
+            }
           >
             Custom…
           </DropdownMenu.Item>

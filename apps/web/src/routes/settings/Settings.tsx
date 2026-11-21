@@ -44,6 +44,7 @@ import { downloadBlob } from '../../lib/images';
 import { SHORTCUTS, comboFromEvent, prettyCombo } from '../../lib/shortcuts';
 import { isIOS, isTauri } from '../../platform/detect';
 import { queryClient } from '../../lib/queryClient';
+import { confirmAction } from '../../components/Ask';
 
 const SECTIONS = [
   ['account', 'Account'],
@@ -774,8 +775,14 @@ function PrivacySection() {
           size="sm"
           variant="ghost"
           onClick={() =>
-            window.confirm('Clear your whole listening history?') &&
-            void clearHistory().then(() => toast.success('History cleared'))
+            void confirmAction({
+              title: 'Clear listening history?',
+              body: 'Stats, Wrapped and Made for you start over.',
+              confirmLabel: 'Clear history',
+              danger: true,
+            }).then((ok) => {
+              if (ok) void clearHistory().then(() => toast.success('History cleared'));
+            })
           }
         >
           Clear history
@@ -817,9 +824,11 @@ function DataSection() {
       try {
         const b = parseBackup(await f.text());
         if (
-          !window.confirm(
-            `Restore this backup from ${new Date(b.exportedAt).toLocaleString()}? Records in it replace matching ones here.`,
-          )
+          !(await confirmAction({
+            title: 'Restore backup?',
+            body: `Backup from ${new Date(b.exportedAt).toLocaleString()}. Records in it replace matching ones on this device.`,
+            confirmLabel: 'Restore',
+          }))
         )
           return;
         for (const [t, rows] of Object.entries(b.data)) {
@@ -903,8 +912,17 @@ function DataSection() {
           variant="ghost"
           disabled={!info?.opfsFiles}
           onClick={() =>
-            window.confirm('Delete all copied audio files from private storage?') &&
-            void clearOpfsCopies().then((n) => (toast.success(`Deleted ${n} files`), refresh()))
+            void confirmAction({
+              title: 'Delete copied files?',
+              body: 'Removes every audio file copied into private storage. Linked files on your disk are not touched.',
+              confirmLabel: 'Delete',
+              danger: true,
+            }).then((ok) => {
+              if (ok)
+                void clearOpfsCopies().then(
+                  (n) => (toast.success(`Deleted ${n} files`), refresh()),
+                );
+            })
           }
         >
           Delete copies

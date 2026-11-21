@@ -27,9 +27,9 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 - [x] P0 Setup — monorepo, tooling, CLAUDE.md, CI, env validation + missing-key screen
 - [x] P1 Core + audio engine + local files (engine side; UI side ships in P2)
 - [x] P2 App shell + themes
-- [ ] P3 Sources
-- [ ] P4 Player + library
-- [ ] P5 Supabase
+- [x] P3 Sources
+- [x] P4 Player + library
+- [x] P5 Supabase (code + SQL validated offline; live project = LATER.md)
 - [ ] P6 PWA
 - [ ] P7 Desktop (Tauri)
 - [ ] P8 Extension
@@ -101,13 +101,13 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 
 ### §8 Friends (Supabase)
 
-- [ ] Migrations with RLS + indexes + share RPC + seed
-- [ ] Auth (magic link + password, username, avatar ≤2 MB resized)
-- [ ] Offline-first sync (queue, LWW)
-- [ ] Friends (search, requests, list)
-- [ ] Sharing (/s/<code>, short code, preview page)
-- [ ] Presence activity + privacy toggles
-- [ ] Listening parties (broadcast sync, drift correction, chat, reactions, pass control)
+- [x] Migrations with RLS + indexes + share RPC + seed
+- [x] Auth (magic link + password, username, avatar ≤2 MB resized)
+- [x] Offline-first sync (queue, LWW)
+- [x] Friends (search, requests, list)
+- [x] Sharing (/s/<code>, short code, preview page)
+- [x] Presence activity + privacy toggles
+- [x] Listening parties (broadcast sync, drift correction, chat, reactions, pass control)
 
 ### §9 Themes
 

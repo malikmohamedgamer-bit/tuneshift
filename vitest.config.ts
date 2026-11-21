@@ -8,7 +8,11 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['packages/*/test/**/*.test.ts', 'apps/*/src/**/*.test.ts'],
+          include: [
+            'packages/*/test/**/*.test.ts',
+            'apps/*/src/**/*.test.ts',
+            'supabase/test/**/*.test.ts',
+          ],
           exclude: ['**/*.browser.test.ts', '**/node_modules/**'],
         },
       },

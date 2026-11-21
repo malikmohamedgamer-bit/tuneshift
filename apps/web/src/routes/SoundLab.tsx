@@ -33,6 +33,7 @@ import { Artwork, CapabilityBadge, PageHeader, SectionHeader } from '../componen
 import { PresetBadge } from '../components/player/PlayerControls';
 import { VisualizerCanvas } from '../components/player/VisualizerCanvas';
 import { player } from '../player/controller';
+import { askText } from '../components/Ask';
 import { usePlayer } from '../state/player';
 import { useSettings } from '../state/settings';
 import { useSound } from '../state/sound';
@@ -139,7 +140,11 @@ function MySounds() {
     input.click();
   };
   const importCode = async () => {
-    const code = window.prompt('Paste a sound code or link');
+    const code = await askText({
+      title: 'Add a shared sound',
+      label: 'Paste a sound code or link',
+      placeholder: 'ts1.s.… or https://…/s/…',
+    });
     if (!code) return;
     try {
       const p = decodeShareCode(code);

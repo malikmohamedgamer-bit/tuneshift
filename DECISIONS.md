@@ -36,3 +36,22 @@
 - Auto headroom = −(peak EQ+bass boost − 6 dB) when the peak exceeds +6 dB, computed analytically from the Web Audio biquad formulas (same maths draws the EQ curve).
 - Demo loops synthesised in Node by `scripts/synth.ts` (our own oscillators/envelopes, no samples) and encoded at 112 kbps MP3 with lamejs.
 - P1's UI half (file import screens, Sound Lab controls, My Sounds UI, visualizer UI, export dialog) ships with the P2 app shell instead of a throwaway P1 UI — avoids building the screens twice.
+
+## App structure
+- Phases 3 (sources UI) and 4 (player + library) landed inside the phase-2 commit — the screens and the player controller were built together; later phase commits cover what remained.
+- Icons: `lucide-react` 1.77 (ISC) instead of hand-drawn SVGs — consistent, accessible, tree-shaken.
+- Drag reordering: `motion`'s Reorder (already used for animation) + Alt+↑/↓ keyboard moves and "Move up/down" menu items for accessibility — avoids a separate DnD library.
+- Router: React Router 8 `createBrowserRouter` with `basename` = Vite BASE_URL; every route has an errorElement; unknown paths render a not-found page inside the shell.
+- Local cover art lives in IndexedDB and is referenced by `idb-cover:<id>` tokens resolved to object URLs (no huge data URLs in track records).
+- Browsers without File System Access copy dropped files into OPFS (persisted); browsers with neither keep the File for the session only and say so.
+- Sound persistence semantics: a preset picked in the Sound Lab stays on for the next songs ("your pick") unless a song/playlist assignment overrides it; "Reset to default" drops the pick.
+- `window.prompt/confirm` replaced by an in-app `askText`/`confirmAction` dialog service (themed, accessible).
+- Audius artwork hosts sometimes return 502/503: the Artwork component retries the same path on the API's `mirrors` hosts before falling back to a gradient.
+
+## Supabase (phase 5)
+- Synced tables keep the client's LWW stamp in `updated_at` (ms) and a server `synced_at` (trigger) as the pull cursor — pulls are immune to device clock skew; merges are LWW per record with tombstones.
+- Folders, smart playlists, sound assignments, lyrics offsets and portable settings share one `user_records(kind, id, data)` table — fewer tables, same RLS rule.
+- Friend activity uses Realtime Presence on private `activity:<uid>` channels; RLS on `realtime.messages` lets only accepted friends read them. Parties use private `party:<code>` channels gated by `party_members` (joined through the `join_party` RPC).
+- Share links: offline codes (`ts1.<kind>.<deflate+base64url>.<checksum>`) work with no server at all; short codes need Supabase and resolve through the `get_share` SECURITY DEFINER RPC that returns only the requested row.
+- No live Postgres/Supabase was available: SQL is syntax-checked in CI with `libpg-query` (the real Postgres 18 parser, WASM), and the sync engine is tested against an in-memory fake client.
+- Supabase URL + anon key can be pasted at runtime (Settings → Account) — the Pages build needs no secrets; service-role keys are rejected by a JWT `role` / `sb_secret_` check.
