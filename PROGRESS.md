@@ -18,10 +18,10 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 ## Status
 
 - **Done:** P0–P8. Desktop crate passes cargo check/clippy -D warnings/test on CI (windows-latest); extension builds, zips and passes 6 E2E tests in a real browser.
-- **Now:** v0.1.0 release (tag → desktop-release.yml) → P9 polish (a11y, Lighthouse, MANUAL_TESTS.md, README.md, LATER.md).
+- **Now:** all phases done. v0.1.0 tagged → desktop-release.yml builds the draft release. Remaining items need the owner (LATER.md) or a real device (MANUAL_TESTS.md).
 - **Gate (latest):** typecheck ✅ lint ✅ unit 112 ✅ e2e 24 ✅ (18 web incl. axe on 8 screens + 6 extension). Shell JS 295.8 KB gz before load.
 - **Local browser note:** Playwright's full Chromium can't start on this Windows Insider build (side-by-side error), so the extension E2E falls back to installed Edge locally; CI (Linux) uses Chromium.
-- **Known polish items:** replace window.prompt (custom sleep minutes, paste sound/theme code) with modals; Lighthouse run; bundle-size check.
+- **Lighthouse (Edge, production build):** desktop 98 perf / 98 a11y / 100 best practices; mobile (simulated slow 4G) 81 / 98 / 100.
 
 ## Phases
 
@@ -34,7 +34,7 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 - [x] P6 PWA (offline shell, install prompt + iOS hint, update toast, Background-safe mode; critical-path JS 296 KB gz)
 - [x] P7 Desktop (Tauri) — Rust compiled on CI only (no local MSVC; installing it needs UAC)
 - [x] P8 Extension
-- [ ] P9 Polish & audit
+- [x] P9 Polish & audit (README, MANUAL_TESTS, LATER, Lighthouse, bundle budget)
 
 ## Feature checklist (by spec section)
 

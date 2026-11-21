@@ -83,3 +83,7 @@
 - Speed on live tab audio: without page speed, tape speed becomes a pitch shift (as in desktop Boost) and the speed slider is disabled with the reason; with page speed on, the page's own player runs at the chosen speed (`preservesPitch` = Keep pitch) and the engine stops converting speed to pitch so it isn't applied twice. Spotify Web is marked "speed not supported".
 - My Sounds live in `chrome.storage.sync`, one key per sound (8 KB item limit), max 60. Share codes: offline `ts1.` codes import directly; short links need the app (they're resolved through Supabase), and the popup says so.
 - Extension E2E: Playwright loads the unpacked build in full Chromium; locally (where that binary can't start) it falls back to Edge. Tab capture itself needs a real toolbar click, so it's covered in MANUAL_TESTS.md.
+
+## Polish (phase 9)
+- Lighthouse was run with Lighthouse 13.6.0 against the production build in Edge (Playwright's full Chromium can't start on this Windows Insider build). Desktop preset: 98/98/100. Mobile preset: 81/98/100 — LCP on a first visit is the onboarding text, which waits for the ~296 KB gz app shell under simulated slow 4G + 4× CPU. Accepted for v0.1.0 (target met on desktop, critical JS under the 300 KB budget); prerendering the onboarding/home shell is the next step if mobile matters.
+- Shell budget kept under 300 KB gz by lazy-loading the desktop title bar and the lyrics tab.
