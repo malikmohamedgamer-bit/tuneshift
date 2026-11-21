@@ -6,4 +6,4 @@ export * from './corsProbe';
 export * from './visualizer';
 export * from './loudness';
 export * from './wav';
-export { createPitchNode } from './pitch';
+export { createPitchNode, setPitchWorkletUrl } from './pitch';

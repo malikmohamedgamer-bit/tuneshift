@@ -20,6 +20,9 @@ importers:
       '@playwright/test':
         specifier: 1.65.1
         version: 1.65.1
+      '@types/chrome':
+        specifier: 0.3.7
+        version: 0.3.7
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -92,6 +95,9 @@ importers:
       '@tuneshift/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      lucide-react:
+        specifier: 1.77.0
+        version: 1.77.0(@types/react@19.3.0)(react@19.3.1)
       react:
         specifier: 19.3.1
         version: 19.3.1

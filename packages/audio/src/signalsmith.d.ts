@@ -30,9 +30,10 @@ declare module 'signalsmith-stretch' {
     addBuffers(buffers: Float32Array[]): Promise<number>;
     dropBuffers(toSeconds?: number): Promise<unknown>;
   }
-  const SignalsmithStretch: (
-    ctx: BaseAudioContext,
-    options?: AudioWorkletNodeOptions,
-  ) => Promise<StretchNode>;
+  const SignalsmithStretch: {
+    (ctx: BaseAudioContext, options?: AudioWorkletNodeOptions): Promise<StretchNode>;
+    /** Optional URL of SignalsmithStretch.mjs itself, used instead of a generated blob: URL. */
+    moduleUrl?: string;
+  };
   export default SignalsmithStretch;
 }

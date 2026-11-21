@@ -1,0 +1,16 @@
+@import '@tuneshift/ui/styles.css';
+@source '..';
+
+html,
+body {
+  width: 380px;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  max-height: 600px;
+  overflow-y: auto;
+  font-family: var(--font-body, 'Inter Variable', system-ui, sans-serif);
+}

@@ -17,9 +17,10 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 
 ## Status
 
-- **Done:** P0, P1, P2 (shell, themes, every screen), and most of P3/P4/P5 client work (sources UI, player/library features, Supabase client: auth, sync engine, friends, presence, parties, sharing).
-- **Now:** P3/P4 gaps → P5 (SQL validation, sync tests) → P6 PWA → P7 desktop → P8 extension → P9 polish.
-- **Gate (latest):** typecheck ✅ lint ✅ unit 98 ✅ e2e 16 ✅ (incl. axe on 8 screens).
+- **Done:** P0–P8. Desktop crate passes cargo check/clippy -D warnings/test on CI (windows-latest); extension builds, zips and passes 6 E2E tests in a real browser.
+- **Now:** v0.1.0 release (tag → desktop-release.yml) → P9 polish (a11y, Lighthouse, MANUAL_TESTS.md, README.md, LATER.md).
+- **Gate (latest):** typecheck ✅ lint ✅ unit 112 ✅ e2e 24 ✅ (18 web incl. axe on 8 screens + 6 extension). Shell JS 295.8 KB gz before load.
+- **Local browser note:** Playwright's full Chromium can't start on this Windows Insider build (side-by-side error), so the extension E2E falls back to installed Edge locally; CI (Linux) uses Chromium.
 - **Known polish items:** replace window.prompt (custom sleep minutes, paste sound/theme code) with modals; Lighthouse run; bundle-size check.
 
 ## Phases
@@ -31,8 +32,8 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 - [x] P4 Player + library
 - [x] P5 Supabase (code + SQL validated offline; live project = LATER.md)
 - [x] P6 PWA (offline shell, install prompt + iOS hint, update toast, Background-safe mode; critical-path JS 296 KB gz)
-- [ ] P7 Desktop (Tauri)
-- [ ] P8 Extension
+- [x] P7 Desktop (Tauri) — Rust compiled on CI only (no local MSVC; installing it needs UAC)
+- [x] P8 Extension
 - [ ] P9 Polish & audit
 
 ## Feature checklist (by spec section)
@@ -132,15 +133,16 @@ Resume rule: "continue from PROGRESS.md". Update after every meaningful step.
 
 - [x] PWA (offline shell, install prompt, update toast, Background-safe mode)
 - [ ] GitHub Pages deploy (base, 404 fallback, scope)
-- [ ] Desktop: main window (title bar, state, tray-close), mini player, overlay, tray, global shortcuts, single instance, autostart, deep links, file associations
-- [ ] Desktop: Discord RPC, Boost mode (wizard, capture, latency, meter), SMTC, WebView2 permission
-- [ ] Desktop: icons, NSIS, release workflow, v0.1.0 tag
-- [ ] Extension: tab capture boost (multi-tab, badge, cleanup), popup, My Sounds sync, share-code import, speed content script, zip
+- [x] Desktop: main window (title bar, state, tray-close), mini player, overlay, tray, global shortcuts, single instance, autostart, deep links, file associations
+- [x] Desktop: Discord RPC, Boost mode (wizard, capture, latency, meter), SMTC, WebView2 permission
+- [x] Desktop: icons, NSIS, release workflow
+- [ ] Desktop: v0.1.0 tag → draft release built
+- [x] Extension: tab capture boost (multi-tab, badge, cleanup), popup, My Sounds sync, share-code import, speed content script, zip
 
 ### §13 Tests
 
 - [x] Vitest unit suites listed in §13
 - [x] Audio OfflineAudioContext preset tests (a–f)
 - [x] Playwright E2E flow + axe
-- [ ] Rust cargo tests
-- [ ] CI on every push
+- [x] Rust cargo tests (CI, windows-latest)
+- [x] CI on every push

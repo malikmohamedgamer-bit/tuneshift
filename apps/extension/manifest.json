@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Tuneshift Boost",
+  "short_name": "Tuneshift",
+  "version": "0.1.0",
+  "description": "Live Sound Lab for any tab: presets, 10-band EQ, bass, reverb, 8D, widener and pitch. Processed live, never recorded.",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Tuneshift Boost",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["tabCapture", "offscreen", "storage", "scripting", "activeTab"],
+  "commands": {
+    "toggle-boost": {
+      "suggested_key": { "default": "Alt+Shift+B" },
+      "description": "Boost this tab on/off"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
